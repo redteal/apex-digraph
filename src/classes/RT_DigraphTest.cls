@@ -1,7 +1,7 @@
-@isTest class RT_DirectedGraphTest {
+@isTest class RT_DigraphTest {
     
     @isTest static void testDigraph() {
-        RT_DirectedGraph graph = new RT_DirectedGraph();
+        RT_Digraph graph = new RT_Digraph();
         
         graph.addNode(1);
         graph.addNode(2);
@@ -28,7 +28,7 @@
         System.assertEquals(false, graph.nodeExists(5));
         System.assertEquals(false, graph.edgeExists(5, 1));
         
-        RT_DirectedGraph reversed = graph.copy().reverse();
+        RT_Digraph reversed = graph.copy().reverse();
         System.assertEquals(4, reversed.size());
         System.assertEquals(true, reversed.edgeExists(3, 2));
         System.assertEquals(true, reversed.edgeExists(4, 3));
@@ -58,7 +58,7 @@
             graph.toposort();
             System.assert(false);
         }
-        catch (RT_DirectedGraph.IllegalArgumentException e) {}
+        catch (RT_Digraph.IllegalArgumentException e) {}
         
         graph.removeEdge(4, 2);
         

@@ -1,22 +1,4 @@
-public class RT_DirectedGraph implements IDirectedGraph {
-
-	public interface IDirectedGraph {
-		void clear();
-		RT_DirectedGraph copy();
-		Set<Object> getNodes();
-		void addNode(Object node);
-		void removeNode(Object node);
-		void addEdge(Object start, Object dest);
-		void removeEdge(Object start, Object dest);
-		Boolean nodeExists(Object node);
-		Boolean edgeExists(Object start, Object dest);
-		Set<Object> edgesFrom(Object start);
-		Set<Object> edgesTo(Object dest);
-		Integer size();
-		Boolean isEmpty();
-		RT_DirectedGraph reverse();
-		List<Object> toposort();
-	}
+public class RT_Digraph {
 	
 	/**
 	 * Toposort sorting strategy singleton
@@ -37,7 +19,7 @@ public class RT_DirectedGraph implements IDirectedGraph {
 	/**
 	 * Construct an empty graph
 	 */
-	public RT_DirectedGraph() {
+	public RT_Digraph() {
 		graph = new Map<Object, Set<Object>>();
 		reversed = new Map<Object, Set<Object>>();
 	}
@@ -45,7 +27,7 @@ public class RT_DirectedGraph implements IDirectedGraph {
 	/**
 	 * Construct graph with predefined nodes/edges
 	 */
-	public RT_DirectedGraph(Map<Object, Set<Object>> graph) {
+	public RT_Digraph(Map<Object, Set<Object>> graph) {
 		this.graph = graph;
 		reversed = new Map<Object, Set<Object>>();
 	}
@@ -58,8 +40,8 @@ public class RT_DirectedGraph implements IDirectedGraph {
 		reversed.clear();
 	}
 	
-	public RT_DirectedGraph copy() {
-		return new RT_DirectedGraph(graph);
+	public RT_Digraph copy() {
+		return new RT_Digraph(graph);
 	}
 	
 	/**
@@ -171,8 +153,8 @@ public class RT_DirectedGraph implements IDirectedGraph {
 	/**
 	 * @return the reverse of the input graph
 	 */
-	public RT_DirectedGraph reverse() {
-		RT_DirectedGraph result = new RT_DirectedGraph(reversed);
+	public RT_Digraph reverse() {
+		RT_Digraph result = new RT_Digraph(reversed);
 		if (!result.isEmpty()) {
 			return result;
 		}
@@ -199,7 +181,7 @@ public class RT_DirectedGraph implements IDirectedGraph {
 	}
 	
 	public interface SortingStrategy {
-		List<Object> sort(RT_DirectedGraph g);
+		List<Object> sort(RT_Digraph g);
 	}
 	
 	private class TopoSort implements SortingStrategy {
@@ -207,9 +189,9 @@ public class RT_DirectedGraph implements IDirectedGraph {
 		 * Given a directed acyclic graph, returns a topological sorting of the nodes
 		 * in the graph. If the input graph is not a DAG, throws an IllegalArgumentException.
 		 */
-		public List<Object> sort(RT_DirectedGraph g) {
+		public List<Object> sort(RT_Digraph g) {
 			// Reverse graph from the input graph.
-			RT_DirectedGraph reversed = g.reverse();
+			RT_Digraph reversed = g.reverse();
 			
 			// Topologically sorted result
 			List<Object> result = new List<Object>();
@@ -235,7 +217,7 @@ public class RT_DirectedGraph implements IDirectedGraph {
 		 * Recursively perform a DFS from the specified node, marking all nodes
 		 * encountered by the search.
 		 */
-		private void explore(Object node, RT_DirectedGraph g, List<Object> ordering,
+		private void explore(Object node, RT_Digraph g, List<Object> ordering,
 		                     Set<Object> visited, Set<Object> expanded) {
 			// Check whether we've been here before. If so, we should stop the search
 			if (visited.contains(node)) {
