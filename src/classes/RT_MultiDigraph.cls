@@ -5,21 +5,22 @@ public class RT_MultiDigraph {
 	 */
 	private static final SortingStrategy TOPOSORT = new TopoSort();
 	
-	public final Map<Object, Set<Object>> outgoingEdges;
-	public final Map<Object, Set<Object>> incomingEdges;
+	public final Map<Node, Set<Edge>> outgoingEdges;
+	public final Map<Node, Set<Edge>> incomingEdges;
 	
-	public final Map<Object, Object> edgeSources;
-	public final Map<Object, Object> edgeTargets;
+	public final Map<Edge, Node> edgeSources;
+	public final Map<Edge, Node> edgeTargets;
+	
 	
 	/**
 	 * Construct an empty graph
 	 */
 	public RT_MultiDigraph() {
 		this(
-		    new Map<Object, Set<Object>>(),
-		    new Map<Object, Set<Object>>(),
-		    new Map<Object, Object>(),
-		    new Map<Object, Object>()
+		    new Map<Node, Set<Edge>>(),
+		    new Map<Node, Set<Edge>>(),
+		    new Map<Edge, Node>(),
+		    new Map<Edge, Node>()
 		);
 	}
 	
@@ -27,10 +28,10 @@ public class RT_MultiDigraph {
 	 * Construct a predefined graph
 	 */
 	public RT_MultiDigraph(
-	    Map<Object, Set<Object>> outgoingEdges,
-	    Map<Object, Set<Object>> incomingEdges,
-	    Map<Object, Object> edgeSources,
-	    Map<Object, Object> edgeTargets
+	    Map<Node, Set<Edge>> outgoingEdges,
+	    Map<Node, Set<Edge>> incomingEdges,
+	    Map<Edge, Node> edgeSources,
+	    Map<Edge, Node> edgeTargets
 	) {
 		this.outgoingEdges = outgoingEdges.clone();
 		this.incomingEdges = incomingEdges.clone();
@@ -55,21 +56,21 @@ public class RT_MultiDigraph {
 	/**
 	 * @param node node to add to the graph
 	 */
-	public void addNode(Object node) {
+	public void addNode(Node node) {
 		if (!nodeExists(node)) {
-			outgoingEdges.put(node, new Set<Object>());
-			incomingEdges.put(node, new Set<Object>());
+			outgoingEdges.put(node, new Set<Edge>());
+			incomingEdges.put(node, new Set<Edge>());
 		}
 	}
 	
 	/**
 	 * Remove a node from the graph
 	 */
-	public void removeNode(Object node) {
+	public void removeNode(Node node) {
 		if (nodeExists(node)) {
-			Set<Object> edges = outgoingEdges.get(node).clone();
+			Set<Edge> edges = outgoingEdges.get(node).clone();
 			edges.addAll(incomingEdges.get(node));
-			for (Object edge : edges) {
+			for (Edge edge : edges) {
 				removeEdge(edge);
 			}
 			incomingEdges.remove(node);
@@ -81,7 +82,7 @@ public class RT_MultiDigraph {
 	 * Given a source node, and a destination, adds an arc from the
 	 * source node to the destination
 	 */
-	public void addEdge(Object source, Object target, Object edge) {
+	public void addEdge(Node source, Node target, Edge edge) {
 		if (!nodeExists(source) || !nodeExists(target)) {
 			throw new IllegalArgumentException('source and/or target nodes do not exist');
 		}
@@ -96,10 +97,10 @@ public class RT_MultiDigraph {
 	/**
 	 * Remove edge from the graph
 	 */
-	public void removeEdge(Object edge) {
+	public void removeEdge(Edge edge) {
 		if (edgeExists(edge)) {
-			Object sourceNode = edgeSources.get(edge);
-			Object targetNode = edgeTargets.get(edge);
+			Node sourceNode = edgeSources.get(edge);
+			Node targetNode = edgeTargets.get(edge);
 			outgoingEdges.get(sourceNode).remove(edge);
 			incomingEdges.get(targetNode).remove(edge);
 			edgeSources.remove(edge);
@@ -110,12 +111,11 @@ public class RT_MultiDigraph {
 	/**
 	 * Remove edge from source (the dependency) to target from the graph
 	 */
-	public void removeEdge(Object source, Object target) {
+	public void removeEdge(Node source, Node target) {
 		if (nodeExists(source) && nodeExists(target)) {
-			Set<Object> edges = outgoingEdges.get(source).clone();
+			Set<Edge> edges = outgoingEdges.get(source).clone();
 			edges.retainAll(incomingEdges.get(target));
-			System.debug(edges);
-			for (Object edge : edges) {
+			for (Edge edge : edges) {
 				removeEdge(edge);
 			}
 		}
@@ -124,7 +124,7 @@ public class RT_MultiDigraph {
 	/**
 	 * @return all nodes in the graph
 	 */
-	public Set<Object> getNodes() {
+	public Set<Node> getNodes() {
 		// incoming and outgoing will always have the same keys
 		return outgoingEdges.keySet().clone();
 	}
@@ -132,8 +132,8 @@ public class RT_MultiDigraph {
 	/**
 	 * @return all edges in the graph
 	 */
-	public Set<Object> getEdges() {
-		Set<Object> edges = edgeSources.keySet().clone();
+	public Set<Edge> getEdges() {
+		Set<Edge> edges = edgeSources.keySet().clone();
 		edges.addAll(edgeTargets.keySet());
 		return edges;
 	}
@@ -142,7 +142,7 @@ public class RT_MultiDigraph {
 	 * @param node
 	 * @return whether the node exists in the graph
 	 */
-	public Boolean nodeExists(Object node) {
+	public Boolean nodeExists(Node node) {
 		return getNodes().contains(node);
 	}
 	
@@ -150,7 +150,7 @@ public class RT_MultiDigraph {
 	 * @param edge
 	 * @return whether an edge exists
 	 */
-	public Boolean edgeExists(Object edge) {
+	public Boolean edgeExists(Edge edge) {
 		return getEdges().contains(edge);
 	}
 	
@@ -159,7 +159,7 @@ public class RT_MultiDigraph {
 	 * @param target
 	 * @return whether an edge exists from source to target
 	 */
-	public Boolean edgeExists(Object source, Object target) {
+	public Boolean edgeExists(Node source, Node target) {
 		return targetNodes(source).contains(target);
 	}
 	
@@ -168,16 +168,16 @@ public class RT_MultiDigraph {
 	 * @param source
 	 * @return nodes pointing from the source node
 	 */
-	public Set<Object> targetNodes(Object source) {
+	public Set<Node> targetNodes(Node source) {
 		if (nodeExists(source)) {
-			Set<Object> edges = outgoingEdges.get(source);
-			Set<Object> targetNodes = new Set<Object>();
-			for (Object edge : edges) {
+			Set<Edge> edges = outgoingEdges.get(source);
+			Set<Node> targetNodes = new Set<Node>();
+			for (Edge edge : edges) {
 				targetNodes.add(edgeTargets.get(edge));
 			}
 			return targetNodes;
 		}
-		return new Set<Object>();
+		return new Set<Node>();
 	}
 	
 	/**
@@ -186,16 +186,16 @@ public class RT_MultiDigraph {
 	 * @param node
 	 * @return nodes of edges to target node
 	 */
-	public Set<Object> sourceNodes(Object target) {
+	public Set<Node> sourceNodes(Node target) {
 		if (nodeExists(target)) {
-			Set<Object> edges = incomingEdges.get(target);
-			Set<Object> sourceNodes = new Set<Object>();
-			for (Object edge : edges) {
+			Set<Edge> edges = incomingEdges.get(target);
+			Set<Node> sourceNodes = new Set<Node>();
+			for (Edge edge : edges) {
 				sourceNodes.add(edgeSources.get(edge));
 			}
 			return sourceNodes;
 		}
-		return new Set<Object>();
+		return new Set<Node>();
 	}
 	
 	/**
@@ -222,12 +222,81 @@ public class RT_MultiDigraph {
 	/**
 	 * @return topologically sorted list of the nodes in the graph.
 	 */
-	public List<Object> toposort() {
+	public List<Node> toposort() {
 		return TOPOSORT.sort(this);
 	}
 	
 	public interface SortingStrategy {
-		List<Object> sort(RT_MultiDigraph g);
+		List<Node> sort(RT_MultiDigraph g);
+	}
+	
+	private interface BaseElement {
+		Boolean equals(Object o);
+		Integer hashCode();
+	}
+	
+	public interface Node extends BaseElement {}
+	
+	public interface Edge extends BaseElement {}
+	
+	public class ValueNode implements Node {
+
+		public final Object value;
+		private final Integer hashCode;
+
+		public ValueNode(Object value) {
+			this.value = value;
+			this.hashCode = hash(value);
+		}
+
+		private Integer hash(Object value) {
+			Integer res = 17;
+			res = 31 * res + System.hashCode(ValueNode.class);
+			res = 31 * res + (value == null ? 0 : System.hashCode(value));
+			return res;
+		}
+
+		public Boolean equals(Object o) {
+			if (o == null) { return false; }
+			if (o === this) { return true; } // *NOPAD*
+			if (!(o instanceof ValueNode)) { return false; }
+			ValueNode n = (ValueNode) o;
+			return value == n.value;
+		}
+
+		public Integer hashCode() {
+			return hashCode;
+		}
+	}
+	
+	public class ValueEdge implements Edge {
+
+		public final Object value;
+		private final Integer hashCode;
+
+		public ValueEdge(Object value) {
+			this.value = value;
+			this.hashCode = hash(value);
+		}
+
+		private Integer hash(Object value) {
+			Integer res = 17;
+			res = 31 * res + System.hashCode(ValueEdge.class);
+			res = 31 * res + (value == null ? 0 : System.hashCode(value));
+			return res;
+		}
+
+		public Boolean equals(Object o) {
+			if (o == null) { return false; }
+			if (o === this) { return true; } // *NOPAD*
+			if (!(o instanceof ValueEdge)) { return false; }
+			ValueEdge e = (ValueEdge) o;
+			return value == e.value;
+		}
+
+		public Integer hashCode() {
+			return hashCode;
+		}
 	}
 	
 	private class TopoSort implements SortingStrategy {
@@ -235,23 +304,23 @@ public class RT_MultiDigraph {
 		 * Given a directed acyclic graph, returns a topological sorting of the nodes
 		 * in the graph. If the input graph is not a DAG, throws an IllegalArgumentException.
 		 */
-		public List<Object> sort(RT_MultiDigraph g) {
+		public List<Node> sort(RT_MultiDigraph g) {
 			// Reverse graph from the input graph.
 			RT_MultiDigraph reversed = g.reverse();
 			
 			// Topologically sorted result
-			List<Object> result = new List<Object>();
+			List<Node> result = new List<Node>();
 			
 			// Set of visited nodes
-			Set<Object> visited = new Set<Object>();
+			Set<Node> visited = new Set<Node>();
 			
 			/* Set of fully expanded nodes. if the graph contains a cycle, then we can
 			 * detect this by noting that a node has been explored but not fully expanded.
 			 */
-			Set<Object> expanded = new Set<Object>();
+			Set<Node> expanded = new Set<Node>();
 			
 			// Fire off a DFS from each node in the graph.
-			for (Object node : reversed.getNodes()) {
+			for (Node node : reversed.getNodes()) {
 				explore(node, reversed, result, visited, expanded);
 			}
 			// Hand back the resulting ordering.
@@ -263,8 +332,8 @@ public class RT_MultiDigraph {
 		 * Recursively perform a DFS from the specified node, marking all nodes
 		 * encountered by the search.
 		 */
-		private void explore(Object node, RT_MultiDigraph g, List<Object> ordering,
-		                     Set<Object> visited, Set<Object> expanded) {
+		private void explore(Node node, RT_MultiDigraph g, List<Node> ordering,
+		                     Set<Node> visited, Set<Node> expanded) {
 			// Check whether we've been here before. If so, we should stop the search
 			if (visited.contains(node)) {
 				/* There are two cases to consider. First, if this node has
@@ -285,7 +354,7 @@ public class RT_MultiDigraph {
 			visited.add(node);
 			
 			// Recursively explore all of the node's predecessors
-			for (Object predecessor : g.targetNodes(node)) {
+			for (Node predecessor : g.targetNodes(node)) {
 				explore(predecessor, g, ordering, visited, expanded);
 			}
 			

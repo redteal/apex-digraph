@@ -3,28 +3,44 @@
 	@isTest static void testMultiDigraph() {
 		RT_MultiDigraph graph = new RT_MultiDigraph();
 		
-		graph.addNode(1);
-		graph.addNode(2);
-		graph.addNode(3);
-		graph.addNode(4);
-		graph.addNode(5);
+		RT_MultiDigraph.Node n1 = new RT_MultiDigraph.ValueNode(1);
+		RT_MultiDigraph.Node n2 = new RT_MultiDigraph.ValueNode(2);
+		RT_MultiDigraph.Node n3 = new RT_MultiDigraph.ValueNode(3);
+		RT_MultiDigraph.Node n4 = new RT_MultiDigraph.ValueNode(4);
+		RT_MultiDigraph.Node n5 = new RT_MultiDigraph.ValueNode(5);
+		RT_MultiDigraph.Node n6 = new RT_MultiDigraph.ValueNode(6);
+		RT_MultiDigraph.Edge e1 = new RT_MultiDigraph.ValueEdge(1);
+		RT_MultiDigraph.Edge e2 = new RT_MultiDigraph.ValueEdge(2);
+		RT_MultiDigraph.Edge e3 = new RT_MultiDigraph.ValueEdge(3);
+		RT_MultiDigraph.Edge e4 = new RT_MultiDigraph.ValueEdge(4);
+		RT_MultiDigraph.Edge e5 = new RT_MultiDigraph.ValueEdge(5);
+		RT_MultiDigraph.Edge e6 = new RT_MultiDigraph.ValueEdge(6);
+		RT_MultiDigraph.Edge e7 = new RT_MultiDigraph.ValueEdge(7);
+		RT_MultiDigraph.Edge e8 = new RT_MultiDigraph.ValueEdge(8);
+		RT_MultiDigraph.Edge e9 = new RT_MultiDigraph.ValueEdge(9);
+
+		graph.addNode(n1);
+		graph.addNode(n2);
+		graph.addNode(n3);
+		graph.addNode(n4);
+		graph.addNode(n5);
 		
 		System.assertEquals(5, graph.size());
 		
-		System.assertEquals(true, graph.nodeExists(1));
-		System.assertEquals(true, graph.nodeExists(2));
-		System.assertEquals(true, graph.nodeExists(3));
-		System.assertEquals(true, graph.nodeExists(4));
-		System.assertEquals(true, graph.nodeExists(5));
+		System.assertEquals(true, graph.nodeExists(n1));
+		System.assertEquals(true, graph.nodeExists(n2));
+		System.assertEquals(true, graph.nodeExists(n3));
+		System.assertEquals(true, graph.nodeExists(n4));
+		System.assertEquals(true, graph.nodeExists(n5));
 		
-		graph.addEdge(2, 3, '1');
-		graph.addEdge(3, 4, '2');
-		graph.addEdge(3, 4, '2b');
-		graph.addEdge(1, 4, '3');
-		graph.addEdge(1, 3, '4a');
-		graph.addEdge(1, 3, '4b');
-		graph.addEdge(5, 1, '5a');
-		graph.addEdge(5, 1, '6b');
+		graph.addEdge(n2, n3, e1);
+		graph.addEdge(n3, n4, e2);
+		graph.addEdge(n3, n4, e3);
+		graph.addEdge(n1, n4, e4);
+		graph.addEdge(n1, n3, e5);
+		graph.addEdge(n1, n3, e6);
+		graph.addEdge(n5, n1, e7);
+		graph.addEdge(n5, n1, e8);
 		
 		System.assertEquals(8, graph.getEdges().size());
 		System.assertEquals(5, graph.getNodes().size());
@@ -33,8 +49,8 @@
 		System.assertEquals(8, graph.edgeSources.size());
 		System.assertEquals(8, graph.edgeTargets.size());
 		
-		graph.removeNode(5);
-		graph.removeEdge('2b');
+		graph.removeNode(n5);
+		graph.removeEdge(e3);
 		
 		System.assertEquals(5, graph.getEdges().size());
 		System.assertEquals(4, graph.getNodes().size());
@@ -44,18 +60,18 @@
 		System.assertEquals(5, graph.edgeTargets.size());
 
 		System.assertEquals(4, graph.size());
-		System.assertEquals(false, graph.nodeExists(5));
-		System.assertEquals(false, graph.edgeExists(5, 1));
+		System.assertEquals(false, graph.nodeExists(n5));
+		System.assertEquals(false, graph.edgeExists(n5, n1));
 		
 		RT_MultiDigraph reversed = graph.copy().reverse();
 		System.assertEquals(4, reversed.size());
-		System.assertEquals(true, reversed.edgeExists(3, 2));
-		System.assertEquals(true, reversed.edgeExists(4, 3));
-		System.assertEquals(true, reversed.edgeExists(4, 1));
-		System.assertEquals(true, reversed.edgeExists(3, 1));
+		System.assertEquals(true, reversed.edgeExists(n3, n2));
+		System.assertEquals(true, reversed.edgeExists(n4, n3));
+		System.assertEquals(true, reversed.edgeExists(n4, n1));
+		System.assertEquals(true, reversed.edgeExists(n3, n1));
 		
-		System.assertEquals(true, graph.edgeExists(2, 3));
-		System.assertEquals(false, graph.edgeExists(1, 2));
+		System.assertEquals(true, graph.edgeExists(n2, n3));
+		System.assertEquals(false, graph.edgeExists(n1, n2));
 		
 		System.assertEquals(5, graph.getEdges().size());
 		System.assertEquals(4, graph.getNodes().size());
@@ -64,32 +80,32 @@
 		System.assertEquals(5, graph.edgeSources.size());
 		System.assertEquals(5, graph.edgeTargets.size());
 		
-		System.assertEquals(2, graph.targetNodes(1).size());
-		System.assertEquals(1, graph.targetNodes(2).size());
-		System.assertEquals(1, graph.targetNodes(3).size());
-		System.assertEquals(0, graph.targetNodes(4).size());
+		System.assertEquals(2, graph.targetNodes(n1).size());
+		System.assertEquals(1, graph.targetNodes(n2).size());
+		System.assertEquals(1, graph.targetNodes(n3).size());
+		System.assertEquals(0, graph.targetNodes(n4).size());
 		
-		System.assertEquals(true, graph.nodeExists(1));
-		System.assertEquals(0, graph.incomingEdges.get(1).size());
+		System.assertEquals(true, graph.nodeExists(n1));
+		System.assertEquals(0, graph.incomingEdges.get(n1).size());
 
-		System.assertEquals(0, graph.sourceNodes(1).size());
-		System.assertEquals(0, graph.sourceNodes(2).size());
-		System.assertEquals(2, graph.sourceNodes(3).size());
-		System.assertEquals(2, graph.sourceNodes(4).size());
+		System.assertEquals(0, graph.sourceNodes(n1).size());
+		System.assertEquals(0, graph.sourceNodes(n2).size());
+		System.assertEquals(2, graph.sourceNodes(n3).size());
+		System.assertEquals(2, graph.sourceNodes(n4).size());
 		
-		graph.addNode(5);
-		System.assertEquals(true, graph.sourceNodes(6).isEmpty());
+		graph.addNode(n5);
+		System.assertEquals(true, graph.sourceNodes(n6).isEmpty());
 		
-		graph.removeEdge(1, 6);
+		graph.removeEdge(n1, n6);
 		
-		graph.addEdge(4, 2, '7');
+		graph.addEdge(n4, n2, e9);
 		try {
 			graph.toposort();
 			System.assert(false);
 		}
 		catch (RT_MultiDigraph.IllegalArgumentException e) {}
 		
-		graph.removeEdge(4, 2);
+		graph.removeEdge(n4, n2);
 		
 		System.assertEquals(5, graph.toposort().size());
 		
